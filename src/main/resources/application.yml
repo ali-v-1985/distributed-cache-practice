@@ -1,0 +1,117 @@
+spring:
+  application:
+    name: distributed-cache-practice
+  
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10 minutes default TTL
+
+# Server Configuration
+server:
+  port: 8080
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,cache
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Custom Application Properties
+app:
+  cache:
+    # Thunder Herd Protection
+    thunder-herd:
+      enabled: true
+      jitter-percentage: 20  # Add 0-20% random jitter to TTL
+    
+    # Cache Penetration Protection
+    penetration:
+      bloom-filter:
+        enabled: true
+        expected-insertions: 100000
+        false-positive-probability: 0.01
+      null-cache:
+        enabled: true
+        ttl: 300000  # 5 minutes for null values
+    
+    # Cache Breakdown Protection
+    breakdown:
+      hot-keys:
+        - "book:popular:*"
+        - "book:bestseller:*"
+      no-expiry: true
+    
+    # Cache Crash Protection
+    crash:
+      circuit-breaker:
+        enabled: true
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        sliding-window-size: 10
+      cluster:
+        enabled: false  # Set to true when using Redis cluster
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      redis:
+        register-health-indicator: true
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: COUNT_BASED
+
+# Logging Configuration
+logging:
+  level:
+    me.valizadeh.practices.cache: DEBUG
+    org.springframework.cache: DEBUG
+    redis.clients.jedis: DEBUG

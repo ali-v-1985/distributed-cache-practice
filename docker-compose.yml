@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: distributed-cache-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - cache-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  h2-database:
+    image: oscarfonts/h2:2.2.224
+    container_name: distributed-cache-h2
+    ports:
+      - "8082:8082"     # H2 Console
+      - "9092:9092"     # H2 TCP Server
+    environment:
+      - H2_OPTIONS=-web -webAllowOthers -tcp -tcpAllowOthers -baseDir /opt/h2-data
+    volumes:
+      - h2_data:/opt/h2-data
+    networks:
+      - cache-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Redis Cluster setup for cache crash simulation
+  redis-node-1:
+    image: redis:7.2-alpine
+    container_name: redis-node-1
+    ports:
+      - "7001:7001"
+    command: redis-server --port 7001 --cluster-enabled yes --cluster-config-file nodes-7001.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_cluster_1:/data
+    networks:
+      - cache-network
+
+  redis-node-2:
+    image: redis:7.2-alpine
+    container_name: redis-node-2
+    ports:
+      - "7002:7002"
+    command: redis-server --port 7002 --cluster-enabled yes --cluster-config-file nodes-7002.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_cluster_2:/data
+    networks:
+      - cache-network
+
+  redis-node-3:
+    image: redis:7.2-alpine
+    container_name: redis-node-3
+    ports:
+      - "7003:7003"
+    command: redis-server --port 7003 --cluster-enabled yes --cluster-config-file nodes-7003.conf --cluster-node-timeout 5000 --appendonly yes
+    volumes:
+      - redis_cluster_3:/data
+    networks:
+      - cache-network
+
+volumes:
+  redis_data:
+  h2_data:
+  redis_cluster_1:
+  redis_cluster_2:
+  redis_cluster_3:
+
+networks:
+  cache-network:
+    driver: bridge
