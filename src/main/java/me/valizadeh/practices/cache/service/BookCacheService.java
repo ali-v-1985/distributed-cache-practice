@@ -356,7 +356,11 @@ public class BookCacheService {
     public void invalidateAllCaches() {
         try {
             // This would typically be done more selectively in production
-            redisTemplate.getConnectionFactory().getConnection().flushDb();
+            // Using RedisTemplate operations instead of deprecated connection methods
+            redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
+                connection.serverCommands().flushDb();
+                return null;
+            });
             logger.warn("Invalidated all caches - simulating cache crash");
         } catch (Exception e) {
             logger.error("Error invalidating all caches: {}", e.getMessage());

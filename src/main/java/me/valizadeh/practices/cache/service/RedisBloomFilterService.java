@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Redis-backed Bloom Filter implementation that persists across restarts
@@ -142,6 +141,7 @@ public class RedisBloomFilterService {
     public void clear() {
         Set<Object> bloomKeys = redisTemplate.opsForSet().members(BLOOM_FILTER_SET);
         if (bloomKeys != null && !bloomKeys.isEmpty()) {
+
             // Convert to Collection<String> for delete operation
             bloomKeys.forEach(key -> redisTemplate.delete((String) key));
             redisTemplate.delete(BLOOM_FILTER_SET);
