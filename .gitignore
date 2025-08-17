@@ -22,3 +22,91 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Gradle specific
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-*/
+gradle.zip
+
+# Gradle Wrapper
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Spring Boot specific
+*.pid
+spring.log
+
+# Application specific
+application-local.yml
+application-local.properties
+
+# H2 Database files
+*.h2.db
+*.trace.db
+*.lock.db
+
+# Lombok generated files
+*.cache
+
+# Maven (in case someone uses Maven wrapper)
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Docker
+.dockerignore
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Script outputs
+*.log
+test-results.txt
+
+# Test output
+test-output/
+test-results/
+
+# Coverage reports
+coverage/
+*.exec
+
+# JRebel
+rebel.xml
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
