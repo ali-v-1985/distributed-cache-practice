@@ -65,27 +65,27 @@ graph TB
         H2[BookController]
     end
     
-    style A1 fill:#c8e6c9
-    style A2 fill:#c8e6c9
-    style A3 fill:#c8e6c9
-    style A4 fill:#c8e6c9
-    style B1 fill:#c8e6c9
-    style B2 fill:#c8e6c9
-    style B3 fill:#c8e6c9
-    style C1 fill:#c8e6c9
-    style C2 fill:#c8e6c9
-    style D1 fill:#c8e6c9
-    style D2 fill:#c8e6c9
+    style A1 fill:#c8e6c9,color:#000000
+    style A2 fill:#c8e6c9,color:#000000
+    style A3 fill:#c8e6c9,color:#000000
+    style A4 fill:#c8e6c9,color:#000000
+    style B1 fill:#c8e6c9,color:#000000
+    style B2 fill:#c8e6c9,color:#000000
+    style B3 fill:#c8e6c9,color:#000000
+    style C1 fill:#c8e6c9,color:#000000
+    style C2 fill:#c8e6c9,color:#000000
+    style D1 fill:#c8e6c9,color:#000000
+    style D2 fill:#c8e6c9,color:#000000
     
-    style E1 fill:#ffecb3
-    style E2 fill:#ffecb3
-    style F1 fill:#ffecb3
-    style F2 fill:#ffecb3
-    style G1 fill:#ffecb3
-    style G2 fill:#ffecb3
+    style E1 fill:#ffecb3,color:#000000
+    style E2 fill:#ffecb3,color:#000000
+    style F1 fill:#ffecb3,color:#000000
+    style F2 fill:#ffecb3,color:#000000
+    style G1 fill:#ffecb3,color:#000000
+    style G2 fill:#ffecb3,color:#000000
     
-    style H1 fill:#e1f5fe
-    style H2 fill:#e1f5fe
+    style H1 fill:#e1f5fe,color:#000000
+    style H2 fill:#e1f5fe,color:#000000
 ```
 
 ### 🏭 **Production-Ready Components** (Keep for Real Applications)
