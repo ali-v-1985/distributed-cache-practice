@@ -12,6 +12,101 @@ This application simulates a book catalog service that demonstrates the four mai
 3. **Cache Breakdown** - Hot key expiration causing database overload
 4. **Cache Crash** - Cache system becoming unavailable
 
+## Code Organization: Production vs Demo Components
+
+This project contains both **production-ready components** and **demonstration/testing components**. Understanding this distinction is crucial for real-world deployment:
+
+```mermaid
+graph TB
+    subgraph "🏭 PRODUCTION COMPONENTS"
+        subgraph "Core Services"
+            A1[BookService]
+            A2[BookCacheService]
+            A3[RedisBloomFilterService]
+            A4[BloomFilterMaintenanceService]
+        end
+        
+        subgraph "Configuration"
+            B1[RedisConfig]
+            B2[CacheProperties]
+            B3[application.yml]
+        end
+        
+        subgraph "Data Layer"
+            C1[Book Entity]
+            C2[BookRepository]
+        end
+        
+        subgraph "Infrastructure"
+            D1[DistributedCacheApplication]
+            D2[docker-compose.yml]
+        end
+    end
+    
+    subgraph "🧪 TESTING/DEMO COMPONENTS"
+        subgraph "Simulation Services"
+            E1[CacheSimulationService]
+            E2[DataInitializationService]
+        end
+        
+        subgraph "Demo Controllers"
+            F1[CacheProblemsController]
+            F2[BloomFilterController*]
+        end
+        
+        subgraph "Test Scripts"
+            G1[test-cache.ps1]
+            G2[start.sh/start.bat]
+        end
+    end
+    
+    subgraph "📊 MONITORING (Production + Testing)"
+        H1[MonitoringController]
+        H2[BookController]
+    end
+    
+    style A1 fill:#c8e6c9
+    style A2 fill:#c8e6c9
+    style A3 fill:#c8e6c9
+    style A4 fill:#c8e6c9
+    style B1 fill:#c8e6c9
+    style B2 fill:#c8e6c9
+    style B3 fill:#c8e6c9
+    style C1 fill:#c8e6c9
+    style C2 fill:#c8e6c9
+    style D1 fill:#c8e6c9
+    style D2 fill:#c8e6c9
+    
+    style E1 fill:#ffecb3
+    style E2 fill:#ffecb3
+    style F1 fill:#ffecb3
+    style F2 fill:#ffecb3
+    style G1 fill:#ffecb3
+    style G2 fill:#ffecb3
+    
+    style H1 fill:#e1f5fe
+    style H2 fill:#e1f5fe
+```
+
+### 🏭 **Production-Ready Components** (Keep for Real Applications)
+
+- **Core Services**: `BookService`, `BookCacheService`, `RedisBloomFilterService`, `BloomFilterMaintenanceService`
+- **Configuration**: `RedisConfig`, `CacheProperties`, `application.yml`
+- **Data Layer**: `Book` entity, `BookRepository`
+- **Infrastructure**: Main application class, Docker configuration
+
+### 🧪 **Demo/Testing Components** (Remove for Production)
+
+- **Simulation Services**: `CacheSimulationService`, `DataInitializationService`
+- **Demo Controllers**: `CacheProblemsController`
+- **Test Scripts**: PowerShell and shell scripts
+- **Special Note**: `BloomFilterController` contains both management endpoints (production) and testing endpoints (demo)
+
+### 📊 **Monitoring Components** (Production + Testing Features)
+
+- **`MonitoringController`**: Health checks and metrics (production) + detailed cache statistics (helpful for both)
+- **`BookController`**: Standard REST API (production ready)
+
 ## Technologies Used
 
 - **Java 21**
@@ -339,6 +434,97 @@ After running this application, you will understand:
 4. **Monitoring**: How to monitor cache performance and health
 5. **Circuit Breaker Pattern**: Resilient system design principles
 6. **Bloom Filters**: Probabilistic data structures for cache optimization
+
+## 📋 Detailed Component Breakdown
+
+### 🏭 **Production Components - Keep These**
+
+#### Core Services
+- **`BookService`** - Business logic layer
+  - `getAllBooks()`, `saveBook()`, `updateBook()`, `deleteBook()` - Standard CRUD operations
+  - Input validation and transaction management
+  - Bloom filter integration for deleted books
+
+- **`BookCacheService`** - High-performance caching layer
+  - `getBookById()`, `getPopularBooks()`, `getBestsellers()` - Cache-enabled retrieval
+  - `invalidateAllCaches()` - Cache management
+  - Thunder Herd protection (random TTL jitter)
+  - Cache Breakdown protection (hot key management)
+  - Cache Crash protection (circuit breaker pattern)
+
+- **`RedisBloomFilterService`** - Memory-efficient cache penetration protection
+  - `add()`, `mightContain()`, `remove()` - Core Bloom filter operations
+  - `initializeFromDatabase()` - Startup recovery
+  - `cleanupExpiredEntries()` - Memory leak prevention
+  - TTL-based cleanup (24-hour default)
+
+- **`BloomFilterMaintenanceService`** - Automated maintenance
+  - `@EventListener(ApplicationReadyEvent.class)` - Startup initialization
+  - `@Scheduled` cleanup and rebuild tasks
+  - `manualRebuild()` - Operations support
+
+#### Configuration & Infrastructure
+- **`RedisConfig`** - Redis connection and serialization setup
+- **`CacheProperties`** - Type-safe configuration binding
+- **`application.yml`** - Environment-specific settings
+- **`DistributedCacheApplication`** - Main application class
+- **`docker-compose.yml`** - Infrastructure as code
+
+#### Data Layer
+- **`Book`** entity - JPA entity with proper annotations and audit fields
+- **`BookRepository`** - Spring Data JPA repository with custom queries
+
+#### Monitoring (Production Features)
+- **`MonitoringController`** (keep these endpoints):
+  - `/api/monitoring/redis/health` - Redis health check
+  - `/api/monitoring/cache/stats` - Cache statistics
+  - `/api/monitoring/performance` - System performance metrics
+  - `/api/monitoring/cache/keys` - Cache key analysis
+
+- **`BookController`** - Standard REST API
+  - `GET /api/books` - List all books
+  - `GET /api/books/{id}` - Get book by ID
+  - `POST /api/books` - Create new book
+  - `PUT /api/books/{id}` - Update book
+  - `DELETE /api/books/{id}` - Delete book
+
+### 🧪 **Demo/Testing Components - Remove These**
+
+#### Simulation Services (Educational Only)
+- **`CacheSimulationService`** - Artificially triggers cache problems
+  - `simulateThunderHerd()` - Creates artificial cache expiration storms
+  - `simulateCachePenetration()` - Generates requests for non-existent data
+  - `simulateCacheBreakdown()` - Forces hot key expiration
+  - `simulateCacheCrash()` - Simulates cache unavailability
+
+- **`DataInitializationService`** - Pre-populates sample data
+  - `@PostConstruct initializeData()` - Hardcoded sample books
+  - Only for demonstration purposes
+
+#### Demo Controllers (Educational Only)
+- **`CacheProblemsController`** - Triggers cache problem simulations
+  - `/api/cache-problems/thunder-herd/simulate` - Thunder herd demo
+  - `/api/cache-problems/penetration/simulate` - Cache penetration demo
+  - `/api/cache-problems/breakdown/simulate` - Cache breakdown demo
+  - `/api/cache-problems/crash/simulate` - Cache crash demo
+
+- **`BloomFilterController`** (mixed - review endpoints):
+  - 🏭 **Production**: `/api/bloom-filter/rebuild` - Operational maintenance
+  - 🧪 **Demo**: `/api/bloom-filter/test` - Testing functionality
+  - 🧪 **Demo**: `/api/bloom-filter/clear` - Reset for demos
+
+#### Test Infrastructure (Educational Only)
+- **`test-cache.ps1`** - Comprehensive testing script
+- **`start.sh`** / **`start.bat`** - Development startup scripts
+
+### 🚀 **For Production Deployment:**
+
+1. **Remove Demo Components**: Delete `CacheSimulationService`, `DataInitializationService`, `CacheProblemsController`
+2. **Customize BloomFilterController**: Keep operational endpoints, remove testing endpoints
+3. **Update Configuration**: Remove simulation-specific configurations
+4. **Add Real Data**: Replace sample data initialization with actual data migration
+5. **Configure Monitoring**: Set up proper alerting for cache health metrics
+6. **Security**: Add authentication/authorization to management endpoints
 
 ## Contributing
 
