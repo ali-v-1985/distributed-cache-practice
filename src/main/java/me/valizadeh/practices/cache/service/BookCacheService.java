@@ -26,7 +26,7 @@ public class BookCacheService {
     private final BookRepository bookRepository;
     private final RedisTemplate<String, Book> bookRedisTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final BloomFilterService bloomFilterService;
+    private final RedisBloomFilterService bloomFilterService;
     private final CacheProperties cacheProperties;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     
@@ -37,10 +37,10 @@ public class BookCacheService {
     private static final String BESTSELLER_BOOKS_KEY = "book:bestseller:all";
     private static final String NULL_VALUE_PREFIX = "null:";
     
-    public BookCacheService(BookRepository bookRepository, 
+        public BookCacheService(BookRepository bookRepository,
                            RedisTemplate<String, Book> bookRedisTemplate,
                            RedisTemplate<String, Object> redisTemplate,
-                           BloomFilterService bloomFilterService,
+                           RedisBloomFilterService bloomFilterService,
                            CacheProperties cacheProperties) {
         this.bookRepository = bookRepository;
         this.bookRedisTemplate = bookRedisTemplate;

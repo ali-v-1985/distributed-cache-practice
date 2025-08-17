@@ -23,7 +23,7 @@ public class CacheSimulationService {
     
     private final BookCacheService bookCacheService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final BloomFilterService bloomFilterService;
+    private final RedisBloomFilterService bloomFilterService;
     
     // Simulation statistics
     private final AtomicLong totalCacheHits = new AtomicLong(0);
@@ -34,7 +34,7 @@ public class CacheSimulationService {
     
     public CacheSimulationService(BookCacheService bookCacheService,
                                 RedisTemplate<String, Object> redisTemplate,
-                                BloomFilterService bloomFilterService) {
+                                RedisBloomFilterService bloomFilterService) {
         this.bookCacheService = bookCacheService;
         this.redisTemplate = redisTemplate;
         this.bloomFilterService = bloomFilterService;

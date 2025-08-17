@@ -32,6 +32,8 @@ public class CacheProperties {
             private boolean enabled = true;
             private int expectedInsertions = 100000;
             private double falsePositiveProbability = 0.01;
+            private int ttlHours = 24;
+            private int rebuildIntervalHours = 6;
         }
         
         @Data

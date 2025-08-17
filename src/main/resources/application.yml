@@ -68,15 +68,17 @@ app:
       enabled: true
       jitter-percentage: 20  # Add 0-20% random jitter to TTL
     
-    # Cache Penetration Protection
-    penetration:
-      bloom-filter:
-        enabled: true
-        expected-insertions: 100000
-        false-positive-probability: 0.01
-      null-cache:
-        enabled: true
-        ttl: 300000  # 5 minutes for null values
+      # Cache Penetration Protection
+  penetration:
+    bloom-filter:
+      enabled: true
+      expected-insertions: 100000
+      false-positive-probability: 0.01
+      ttl-hours: 24  # Bloom filter entries expire after 24 hours
+      rebuild-interval-hours: 6  # Rebuild from database every 6 hours
+    null-cache:
+      enabled: true
+      ttl: 300000  # 5 minutes for null values
     
     # Cache Breakdown Protection
     breakdown:

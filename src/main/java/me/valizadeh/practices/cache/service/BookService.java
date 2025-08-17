@@ -19,9 +19,9 @@ public class BookService {
     private static final Logger logger = LoggerFactory.getLogger(BookService.class);
     
     private final BookRepository bookRepository;
-    private final BloomFilterService bloomFilterService;
+    private final RedisBloomFilterService bloomFilterService;
     
-    public BookService(BookRepository bookRepository, BloomFilterService bloomFilterService) {
+    public BookService(BookRepository bookRepository, RedisBloomFilterService bloomFilterService) {
         this.bookRepository = bookRepository;
         this.bloomFilterService = bloomFilterService;
     }
@@ -81,6 +81,17 @@ public class BookService {
     
     public void deleteBook(Long id) {
         logger.debug("Deleting book with ID: {}", id);
+        
+        // Remove from bloom filter before deleting from database
+        bloomFilterService.remove("book:" + id);
+        
+        // Also try to remove ISBN-based key if book exists
+        bookRepository.findById(id).ifPresent(book -> {
+            if (book.getIsbn() != null) {
+                bloomFilterService.remove("book:isbn:" + book.getIsbn());
+            }
+        });
+        
         bookRepository.deleteById(id);
     }
     

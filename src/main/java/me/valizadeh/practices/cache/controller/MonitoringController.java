@@ -1,7 +1,7 @@
 package me.valizadeh.practices.cache.controller;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import me.valizadeh.practices.cache.service.BloomFilterService;
+import me.valizadeh.practices.cache.service.RedisBloomFilterService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +19,11 @@ import java.util.Map;
 public class MonitoringController {
     
     private final RedisTemplate<String, Object> redisTemplate;
-    private final BloomFilterService bloomFilterService;
+    private final RedisBloomFilterService bloomFilterService;
     private final MeterRegistry meterRegistry;
     
     public MonitoringController(RedisTemplate<String, Object> redisTemplate,
-                              BloomFilterService bloomFilterService,
+                              RedisBloomFilterService bloomFilterService,
                               MeterRegistry meterRegistry) {
         this.redisTemplate = redisTemplate;
         this.bloomFilterService = bloomFilterService;
@@ -186,5 +186,26 @@ public class MonitoringController {
         }
         
         return ResponseEntity.ok(keyInfo);
+    }
+    
+    /**
+     * Get Redis Bloom Filter statistics and health
+     */
+    @GetMapping("/bloom-filter/stats")
+    public ResponseEntity<Map<String, Object>> getBloomFilterStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        try {
+            stats.put("enabled", bloomFilterService.isEnabled());
+            stats.put("approximate_element_count", bloomFilterService.getApproximateElementCount());
+            stats.put("type", "redis_backed");
+            stats.put("persistent", true);
+            stats.put("supports_ttl", true);
+            
+        } catch (Exception e) {
+            stats.put("error", "Failed to retrieve bloom filter stats: " + e.getMessage());
+        }
+        
+        return ResponseEntity.ok(stats);
     }
 }
